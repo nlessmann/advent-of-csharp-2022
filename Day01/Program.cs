@@ -34,7 +34,7 @@ namespace Day01
 
         public int ComputeSolution1()
         {
-            return _caloriesPerElf.Max();
+            return _caloriesPerElf[0];
         }
 
         public int ComputeSolution2()
