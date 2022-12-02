@@ -1,12 +1,10 @@
-﻿using System.Linq;
-
-namespace Day01
+﻿namespace Day01
 {
     public class Puzzle
     {
         private readonly List<int> _caloriesPerElf;
         
-        public Puzzle(string inputFile)
+        private Puzzle(string inputFile)
         {
             // Read puzzle input
             string[] input = File.ReadAllLines(inputFile);
@@ -32,12 +30,12 @@ namespace Day01
             _caloriesPerElf = caloriesPerElf.OrderBy(calories => -calories).ToList();
         }
 
-        public int ComputeSolution1()
+        private int ComputeSolution1()
         {
             return _caloriesPerElf[0];
         }
 
-        public int ComputeSolution2()
+        private int ComputeSolution2()
         {
             return _caloriesPerElf.Take(3).Sum();
         }
