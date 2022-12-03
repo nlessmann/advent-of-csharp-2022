@@ -4,8 +4,8 @@ namespace Day03
 {
     internal class Rucksack
     {
-        private readonly List<int> _leftCompartment;
-        private readonly List<int> _rightCompartment;
+        private readonly IEnumerable<int> _leftCompartment;
+        private readonly IEnumerable<int> _rightCompartment;
 
         private IEnumerable<int> Priorities => _leftCompartment.Concat(_rightCompartment);
 
@@ -16,10 +16,10 @@ namespace Day03
             _rightCompartment = _parseContentIntoPriorities(content[n..]);
         }
 
-        private static List<int> _parseContentIntoPriorities(string content)
+        private static IEnumerable<int> _parseContentIntoPriorities(string content)
         {
             byte[] ascii = Encoding.ASCII.GetBytes(content);
-            return content.Zip(ascii, (c, p) => char.IsUpper(c) ? p - 38 : p - 96).ToList();
+            return content.Zip(ascii, (c, p) => char.IsUpper(c) ? p - 38 : p - 96);
         }
 
         public int DuplicateItemPriority()
