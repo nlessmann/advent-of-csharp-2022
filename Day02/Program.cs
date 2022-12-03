@@ -104,6 +104,7 @@
             }
         }
     }
+    
     public class Puzzle
     {
         private readonly List<IRockPaperScissorsRound> _rounds;
