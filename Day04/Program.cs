@@ -5,12 +5,6 @@
         public readonly int First;
         public readonly int Last;
 
-        private SectionRange(int first, int last)
-        {
-            First = first;
-            Last = last;
-        }
-
         public SectionRange(string range)
         {
             string[] values = range.Split('-');
@@ -23,13 +17,9 @@
             return First <= other.First && Last >= other.Last;
         }
 
-        public SectionRange? Intersect(SectionRange other)
+        public bool Intersects(SectionRange other)
         {
-            if (Last < other.First || First > other.Last) return null;
-
-            int newFirst = Math.Max(First, other.First);
-            int newLast = Math.Min(Last, other.Last);
-            return new SectionRange(newFirst, newLast);
+            return !(Last < other.First || First > other.Last);
         }
     }
     
@@ -63,7 +53,7 @@
         
         private int ComputeSolution2()
         {
-            return _pairs.Count(p => p.Left.Intersect(p.Right) != null);
+            return _pairs.Count(p => p.Left.Intersects(p.Right));
         }
         
         public static void Main()
