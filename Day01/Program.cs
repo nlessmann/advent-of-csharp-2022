@@ -2,7 +2,7 @@
 {
     public class Puzzle
     {
-        private readonly List<int> _caloriesPerElf;
+        private readonly IEnumerable<int> _caloriesPerElf;
         
         private Puzzle(string inputFile)
         {
@@ -32,7 +32,7 @@
 
         private int ComputeSolution1()
         {
-            return _caloriesPerElf[0];
+            return _caloriesPerElf.First();
         }
 
         private int ComputeSolution2()
@@ -50,7 +50,7 @@
             
             var puzzle = new Puzzle(@"D:\Advent\advent-of-csharp-2022\Day01\PuzzleInput.txt");
             Console.WriteLine($"Puzzle solution 1: {puzzle.ComputeSolution1()}");
-            Console.WriteLine($"Puzzle sSolution 2: {puzzle.ComputeSolution2()}");
+            Console.WriteLine($"Puzzle solution 2: {puzzle.ComputeSolution2()}");
         }
     }
 }

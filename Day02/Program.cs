@@ -107,29 +107,31 @@
     
     public class Puzzle
     {
-        private readonly List<IRockPaperScissorsRound> _rounds;
+        private readonly IEnumerable<IRockPaperScissorsRound> _rounds;
         
         private Puzzle(string inputFile)
         {
             string[] input = File.ReadAllLines(inputFile);
             
-            _rounds = new List<IRockPaperScissorsRound>();
+            var rounds = new List<IRockPaperScissorsRound>();
             foreach (string line in input)
             {
                 char opponent = line[0];
                 switch (line[2])
                 {
                     case 'X':
-                        _rounds.Add(new RockOrLoose(opponent));
+                        rounds.Add(new RockOrLoose(opponent));
                         break;
                     case 'Y':
-                        _rounds.Add(new PaperOrDraw(opponent));
+                        rounds.Add(new PaperOrDraw(opponent));
                         break;
                     case 'Z':
-                        _rounds.Add(new ScissorsOrWin(opponent));
+                        rounds.Add(new ScissorsOrWin(opponent));
                         break;
                 }
             }
+
+            _rounds = rounds;
         }
 
         private int ComputeSolution1()
@@ -152,7 +154,7 @@
             
             var puzzle = new Puzzle(@"D:\Advent\advent-of-csharp-2022\Day02\PuzzleInput.txt");
             Console.WriteLine($"Puzzle solution 1: {puzzle.ComputeSolution1()}");
-            Console.WriteLine($"Puzzle sSolution 2: {puzzle.ComputeSolution2()}");
+            Console.WriteLine($"Puzzle solution 2: {puzzle.ComputeSolution2()}");
         }
     }
 }

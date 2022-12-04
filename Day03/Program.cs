@@ -1,7 +1,7 @@
-﻿using System.Text;
-
-namespace Day03
+﻿namespace Day03
 {
+    using System.Text;
+
     internal class Rucksack
     {
         private readonly IEnumerable<int> _leftCompartment;
@@ -69,7 +69,7 @@ namespace Day03
             
             var puzzle = new Puzzle(@"D:\Advent\advent-of-csharp-2022\Day03\PuzzleInput.txt");
             Console.WriteLine($"Puzzle solution 1: {puzzle.ComputeSolution1()}");
-            Console.WriteLine($"Puzzle sSolution 2: {puzzle.ComputeSolution2()}");
+            Console.WriteLine($"Puzzle solution 2: {puzzle.ComputeSolution2()}");
         }
     }
 }
