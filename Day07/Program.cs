@@ -36,29 +36,22 @@
         }
 
         public int Size => _fileSize + _directories.Sum(d => d.Size);
+        
+        private IEnumerable<int> DirectorySizes()
+        {
+            yield return Size;
+            foreach (Directory dir in _directories)
+            {
+                foreach (int size in dir.DirectorySizes())
+                {
+                    yield return size;
+                }
+            }
+        }
 
         public int SizeOfSmallDirectories()
         {
-            int sum = _directories.Sum(d => d.SizeOfSmallDirectories());
-
-            int size = Size;
-            if (size <= 100000)
-            {
-                sum += size;
-            }
-
-            return sum;
-        }
-
-        private IEnumerable<int> DirectorySizes()
-        {
-            var sizes = new List<int>() { Size };
-            foreach (Directory dir in _directories)
-            {
-                sizes.AddRange(dir.DirectorySizes());
-            }
-
-            return sizes;
+            return DirectorySizes().Where(size => size <= 100000).Sum();
         }
 
         public int FreeUpSpace(int requiredSpace)
