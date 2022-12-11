@@ -11,7 +11,6 @@
         public Monkey? FalseDestination { get; set; }
         
         public long InspectedItems { get; private set; }
-
         public long ScalingFactor;
         
         public Monkey(int divisibleBy, Func<long, long> operation)
@@ -136,7 +135,7 @@
                 .Select(m => m.InspectedItems)
                 .OrderDescending()
                 .Take(2)
-                .Aggregate(1L, (total, value) => total * value);;
+                .Aggregate(1L, (total, value) => total * value);
         }
         
         public static void Main()
