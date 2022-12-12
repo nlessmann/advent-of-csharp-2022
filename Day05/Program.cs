@@ -1,7 +1,7 @@
-﻿using System.Text.RegularExpressions;
-
-namespace Day05
+﻿namespace Day05
 {
+    using System.Text.RegularExpressions;
+    
     public class Puzzle
     {
         private readonly struct Move
