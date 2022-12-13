@@ -5,20 +5,20 @@
     internal partial class Packet : IComparable
     {
         [GeneratedRegex(@"\[((?:\-?\d+,?)*)\]", RegexOptions.Compiled)]
-        private static partial Regex ListExpr();
+        private static partial Regex ListPattern();
         
         private readonly List<List<int>> _lut = new();
 
         public Packet(string tokens)
         {
             Match match;
-            while ((match = ListExpr().Match(tokens)).Success)
+            while ((match = ListPattern().Match(tokens)).Success)
             {
                 string group = match.Groups[1].Value;
                 _lut.Add(group == "" ? new List<int>() : group.Split(",").Select(int.Parse).ToList());
 
                 int id = -_lut.Count;
-                tokens = ListExpr().Replace(tokens, id.ToString(), 1);
+                tokens = ListPattern().Replace(tokens, id.ToString(), 1);
             }
         }
         
@@ -69,9 +69,6 @@
 
             throw new ArgumentException("Object is not a Packet");
         }
-        
-        public static bool operator >=(Packet a, Packet b) => a.CompareTo(b) >= 0;
-        public static bool operator <=(Packet a, Packet b) => a.CompareTo(b) <= 0;
     }
     
     public class Puzzle
@@ -92,7 +89,7 @@
             int score = 0;
             for (int i = 0; i < _packets.Count; i += 2)
             {
-                if (_packets[i] >= _packets[i + 1])
+                if (_packets[i].CompareTo(_packets[i + 1]) >= 0)
                 {
                     score += 1 + (i / 2);
                 }
