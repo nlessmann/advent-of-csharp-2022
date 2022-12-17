@@ -2,8 +2,7 @@
 {
     internal enum JetDirection
     {
-        Left,
-        Right
+        Left, Right
     }
     
     internal readonly struct Rock
@@ -30,8 +29,7 @@
                 
                 return new Rock(rock._rows.Select(b => (byte)((b << 1) & 0xFF)).ToArray());
             }
-            
-            if (direction == JetDirection.Right)
+            else
             {
                 if (rock._rows.Any(b => (b & 0b1) != 0))
                 {
@@ -41,28 +39,24 @@
                 
                 return new Rock(rock._rows.Select(b => (byte)((b >> 1) & 0xFF)).ToArray());
             }
-
-            throw new ArgumentException("Illegal jet direction");
         }
     }
 
     internal class Fingerprint : IEquatable<Fingerprint>
     {
         private readonly IReadOnlyList<byte> _rows;
-        private readonly int _rock;
-        private readonly int _jet;
+        private readonly int _rockIndex;
 
-        public Fingerprint(IEnumerable<byte> rows, int rockIndex, int jetIndex)
+        public Fingerprint(IEnumerable<byte> rows, int rockIndex)
         {
             _rows = rows.ToList();
-            _rock = rockIndex;
-            _jet = jetIndex;
+            _rockIndex = rockIndex;
         }
 
         public bool Equals(Fingerprint? other)
         {
             if (other == null) return false;
-            if (_rock != other._rock || _jet != other._jet) return false;
+            if (_rockIndex != other._rockIndex) return false;
             if (_rows.Count != other._rows.Count) return false;
             return _rows.Zip(other._rows, (aa, bb) => aa == bb).All(v => v);
         }
@@ -74,7 +68,7 @@
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(_rock.GetHashCode(), _rock, _jet);
+            return HashCode.Combine(_rows.GetHashCode(), _rockIndex);
         }
     }
     
@@ -99,14 +93,13 @@
         private int _nextJetIndex;
 
         private const int FingerprintWindow = 25;
-        private const int JetIndexObversationPeriod = 50000;
+        private const int JetObservationPeriod = 50000;
         private readonly Dictionary<(int Height, int Rocks), Fingerprint> _fingerprints = new();
         private readonly Dictionary<int, int> _jetIndices = new();
         private int _cycleJetIndex = -1;
-        
+        public bool CycleDetected { get; private set; }
         public int CycleLength { get; private set; }
         public int CycleRocks { get; private set; }
-        public bool CycleDetected => CycleLength > 0;
 
         public int Height => _rows.Count;
 
@@ -150,8 +143,12 @@
                 }
                 
                 // Attempt to move downwards, check whether the rock would collide
-                if (Collides(rock, y - 1)) break;
+                if (Collides(rock, y - 1))
+                {
+                    break;
+                }
                 
+                // The way is free, drop one unit
                 y--;
             }
             
@@ -165,28 +162,35 @@
                 }
                 else
                 {
-                    _rows[row] = (byte)((_rows[row] | rock[i]) & 0xFF);
+                    _rows[row] = (byte)(_rows[row] | rock[i]);
                 }
             }
 
             _rocks++;
             
             // Fingerprinting to find cycles
-            if (Height <= JetIndexObversationPeriod)
+            CycleDetected = false;
+            
+            if (Height <= JetObservationPeriod)
             {
+                // Record how often we observer each jet index
                 _jetIndices[_nextJetIndex] = _jetIndices.GetValueOrDefault(_nextJetIndex, 0) + 1;
             }
             else if (_cycleJetIndex < 0)
             {
+                // Pick most commonly seen jet index as target for cycle detection
                 _cycleJetIndex = _jetIndices.MaxBy(item => item.Value).Key;
             }
             else if (_nextJetIndex == _cycleJetIndex && CycleLength == 0)
             {
-                Fingerprint fingerprint = new Fingerprint(_rows.TakeLast(FingerprintWindow), _nextRockIndex, _nextJetIndex);
+                // Create fingerprint from the last few rows and compare with previous fingerprints
+                // captured in situations with the same cycle index
+                Fingerprint fingerprint = new Fingerprint(_rows.TakeLast(FingerprintWindow), _nextRockIndex);
                 foreach (var fp in _fingerprints)
                 {
                     if (fp.Value.Equals(fingerprint))
                     {
+                        CycleDetected = true;
                         CycleLength = Height - fp.Key.Height;
                         CycleRocks = _rocks - fp.Key.Rocks;
                         break;
@@ -234,7 +238,7 @@
 
         private long ComputeSolution2()
         {
-            const long iterations = 1000000000000;
+            const long iterations = 1000000000000L;
             
             long offset = 0;
             for (long i = 2022; i < iterations; i++)
