@@ -1,7 +1,18 @@
 ﻿namespace Day18
 {
-    internal readonly record struct Point(int X, int Y, int Z);
-    
+    internal readonly record struct Point(int X, int Y, int Z)
+    {
+        public IEnumerable<Point> Neighbors()
+        {
+            yield return this with { X = X - 1 };
+            yield return this with { X = X + 1 };
+            yield return this with { Y = Y - 1 };
+            yield return this with { Y = Y + 1 };
+            yield return this with { Z = Z - 1 };
+            yield return this with { Z = Z + 1 };
+        }
+    }
+
     internal class VoxelGrid
     {
         private enum VoxelContent : ushort
@@ -59,16 +70,6 @@
             return true;
         }
 
-        private static IEnumerable<Point> Neighbors(Point voxel)
-        {
-            yield return voxel with { X = voxel.X - 1 };
-            yield return voxel with { X = voxel.X + 1 };
-            yield return voxel with { Y = voxel.Y - 1 };
-            yield return voxel with { Y = voxel.Y + 1 };
-            yield return voxel with { Z = voxel.Z - 1 };
-            yield return voxel with { Z = voxel.Z + 1 };
-        }
-
         public int CountSurfaceArea()
         {
             int count = 0;
@@ -76,7 +77,7 @@
             {
                 if (this[p] != VoxelContent.Lava) continue;
 
-                foreach (Point n in Neighbors(p))
+                foreach (Point n in p.Neighbors())
                 {
                     if (!Contains(n) || this[n] == VoxelContent.Empty || this[n] == VoxelContent.Steam)
                     {
@@ -101,7 +102,7 @@
                 Point p = stack.Pop();
                 this[p] = VoxelContent.Steam;
 
-                foreach (Point n in Neighbors(p))
+                foreach (Point n in p.Neighbors())
                 {
                     if (Contains(n) && this[n] == VoxelContent.Empty)
                     {
