@@ -4,17 +4,21 @@
     
     internal class VoxelGrid
     {
-        private enum Voxel : ushort
+        private enum VoxelContent : ushort
         {
             Empty, Lava, Steam, Air
         }
         
-        private readonly Voxel[,,] _voxels;
+        private readonly VoxelContent[,,] _voxels;
         private readonly int _width;
         private readonly int _height;
         private readonly int _depth;
 
-        private Voxel this[Point p] => _voxels[p.X, p.Y, p.Z]; 
+        private VoxelContent this[Point p]
+        {
+            get => _voxels[p.X, p.Y, p.Z];
+            set => _voxels[p.X, p.Y, p.Z] = value;
+        } 
 
         public VoxelGrid(string filename)
         {
@@ -32,10 +36,10 @@
             _depth = cubes.Max(p => p.Z) + 1 + 2;
             
             // Create 3D grid and fill with lava
-            _voxels = new Voxel[_width, _height, _depth];
+            _voxels = new VoxelContent[_width, _height, _depth];
             foreach (Point p in cubes)
             {
-                _voxels[p.X + 1, p.Y + 1, p.Z + 1] = Voxel.Lava;
+                _voxels[p.X + 1, p.Y + 1, p.Z + 1] = VoxelContent.Lava;
             }
         }
 
@@ -70,11 +74,11 @@
             int count = 0;
             foreach (Point p in Voxels())
             {
-                if (this[p] != Voxel.Lava) continue;
+                if (this[p] != VoxelContent.Lava) continue;
 
                 foreach (Point n in Neighbors(p))
                 {
-                    if (!Contains(n) || this[n] == Voxel.Empty || this[n] == Voxel.Steam)
+                    if (!Contains(n) || this[n] == VoxelContent.Empty || this[n] == VoxelContent.Steam)
                     {
                         count++;
                     }
@@ -95,11 +99,11 @@
             while (stack.Count > 0)
             {
                 Point p = stack.Pop();
-                _voxels[p.X, p.Y, p.Z] = Voxel.Steam;
+                this[p] = VoxelContent.Steam;
 
                 foreach (Point n in Neighbors(p))
                 {
-                    if (Contains(n) && this[n] == Voxel.Empty)
+                    if (Contains(n) && this[n] == VoxelContent.Empty)
                     {
                         stack.Push(n);
                     }
@@ -109,9 +113,9 @@
             // Remaining empty voxels have to be air
             foreach (Point p in Voxels())
             {
-                if (this[p] == Voxel.Empty)
+                if (this[p] == VoxelContent.Empty)
                 {
-                    _voxels[p.X, p.Y, p.Z] = Voxel.Air;
+                    this[p] = VoxelContent.Air;
                 }
             }
         }
